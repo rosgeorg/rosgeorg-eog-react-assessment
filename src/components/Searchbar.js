@@ -52,19 +52,21 @@ function Searchbar() {
 
   const handleSelect = (event, value) => {
     console.log('ENTRA A HANDLE SELECT');
-    for (const val in selectedMetrics) {
-      console.log(`OPCIÓN ${val}: ${selectedMetrics[val]}`);
-      if(selectedMetrics[val] == value){
-        dispatch(deleteMetric(value));
-        console.log(`DESPUES ${selectedMetrics}`);
-      }
-    }
     const selectedValues = value;
     const selectedValue = selectedValues.filter(
       (metric) => !selectedMetrics.includes(metric),
     );
     console.log('SELECTED VALUE',selectedValue);
     console.log('VALUE 0', selectedValue[0]);
+    for (const val in selectedMetrics) {
+      console.log(`OPCIÓN ${val}: ${selectedMetrics[val]}`);
+      console.log(value);
+      if(selectedMetrics[val] == selectedValue[0]){
+        console.log('HAY UNO IGUAL');
+        dispatch(deleteMetric(selectedValue[0]));
+        console.log(`DESPUES ${selectedMetrics}`);
+      }
+    }
     if (selectedValue.length) {
       dispatch(addMetric(selectedValue[0]));
     }
