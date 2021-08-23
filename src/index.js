@@ -1,20 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-} from '@apollo/client';
+import { Provider } from 'react-redux';
 import App from './App';
-
-const client = new ApolloClient({
-  uri: 'https://react.eogresources.com/graphql',
-  cache: new InMemoryCache(),
-});
+import { store } from './store/configureStore';
 
 ReactDOM.render(
-  <ApolloProvider client={client}>
+  <Provider store={store}>
     <App />
-  </ApolloProvider>,
+  </Provider>,
+
   document.getElementById('root'),
 );
