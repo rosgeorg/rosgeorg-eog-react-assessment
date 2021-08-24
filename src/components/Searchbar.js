@@ -12,7 +12,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { useSelector, useDispatch } from 'react-redux';
-import { addMetric, deleteMetric } from '../reducers/metricReducer';
+import { updateMetric, deleteMetric } from '../reducers/metricReducer';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,24 +51,18 @@ function Searchbar() {
   }
 
   const handleSelect = (event, value) => {
-    console.log('ENTRA A HANDLE SELECT');
     const selectedValues = value;
+    selectedMetrics.forEach((data) => {
+      if(selectedValues.indexOf(data) === -1){
+        const i = selectedMetrics.indexOf(data);
+        dispatch((deleteMetric(selectedMetrics[i])))
+      }
+    })
     const selectedValue = selectedValues.filter(
       (metric) => !selectedMetrics.includes(metric),
     );
-    console.log('SELECTED VALUE',selectedValue);
-    console.log('VALUE 0', selectedValue[0]);
-    for (const val in selectedMetrics) {
-      console.log(`OPCIÓN ${val}: ${selectedMetrics[val]}`);
-      console.log(value);
-      if(selectedMetrics[val] == selectedValue[0]){
-        console.log('HAY UNO IGUAL');
-        dispatch(deleteMetric(selectedValue[0]));
-        console.log(`DESPUES ${selectedMetrics}`);
-      }
-    }
     if (selectedValue.length) {
-      dispatch(addMetric(selectedValue[0]));
+      dispatch(updateMetric(selectedValue[0]));
     }
     
   };
@@ -82,6 +76,7 @@ function Searchbar() {
     <Autocomplete
         multiple
         id="tags-standard"
+        style={{ width: "450px" }}
         options={metricNames}
         getOptionLabel={(option) => option}
         onChange={handleSelect}

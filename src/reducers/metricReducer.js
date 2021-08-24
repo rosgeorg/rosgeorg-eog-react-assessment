@@ -5,9 +5,8 @@ export const metricSlice = createSlice({
   name: 'metric',
   initialState: [],
   reducers: {
-    addMetric: (state, action) => [...state, action.payload],
+    updateMetric: (state, action) => [...state, action.payload],
     deleteMetric: (state, action) => {
-      console.log('ENTRA A DELETE');
       return state.filter((metric) => metric !== action.payload);
     },
     clearSelectedMetrics: (state) => {
@@ -16,4 +15,4 @@ export const metricSlice = createSlice({
   },
 });
 
-export const { addMetric, deleteMetric, clearSelectedMetrics } = metricSlice.actions;
+export const { updateMetric, deleteMetric, clearSelectedMetrics } = metricSlice.actions;
