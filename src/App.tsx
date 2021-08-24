@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Header from './components/Header';
 import Wrapper from './components/Wrapper';
 import Searchbar from './components/Searchbar';
+import MetricCard from './components/MetricCard';
 
 const theme = createTheme({
   palette: {
@@ -27,6 +28,7 @@ const App = () => (
     <Wrapper>
       <Header />
       <Searchbar />
+      <MetricCard />
       <ToastContainer />
     </Wrapper>
   </MuiThemeProvider>

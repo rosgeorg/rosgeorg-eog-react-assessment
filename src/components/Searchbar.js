@@ -10,6 +10,7 @@ import {
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
+import Alert from '@material-ui/lab/Alert';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateMetric, deleteMetric } from '../reducers/metricReducer';
@@ -76,7 +77,7 @@ function Searchbar() {
     <Autocomplete
         multiple
         id="tags-standard"
-        style={{ width: "450px" }}
+        style={{ width: "900px" }}
         options={metricNames}
         getOptionLabel={(option) => option}
         onChange={handleSelect}
@@ -84,7 +85,7 @@ function Searchbar() {
           <TextField
             {...params}
             variant="standard"
-            label="Multiple values"
+            label="Metric Values"
             placeholder="Metric"
           />
         )}
