@@ -1,7 +1,5 @@
-/* eslint-disable */
 import React, { useState, useEffect } from 'react';
 import {
-  ResponsiveContainer,
   LineChart,
   Line,
   CartesianGrid,
@@ -18,8 +16,9 @@ import {
   InMemoryCache,
 } from '@apollo/client';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import { Alert, AlertTitle } from '@material-ui/lab';
 import { useSelector } from 'react-redux';
-import { subMinutes, getUnixTime } from 'date-fns'
+import { subMinutes, getUnixTime } from 'date-fns';
 
 const client = new ApolloClient({
   uri: 'https://react.eogresources.com/graphql',
@@ -49,19 +48,17 @@ const MetricChart = () => {
       return;
     }
     const after = getUnixTime(subMinutes(new Date().getTime(), 30));
-    setMetricQuery(selectedMetrics.map((metricName) => {
-    return{
+    setMetricQuery(selectedMetrics.map((metricName) => ({
       metricName,
       after,
-    }
-    }));
+    })));
   }, [selectedMetrics]);
 
   const { loading, error, data } = useQuery(MULTIPLE_METRICS_MEASUREMENTS, {
     variables: { input: [...metricQuery] },
   });
   if (loading) {
-    return <CircularProgress />
+    return <CircularProgress />;
   }
   if (error) {
     return (
@@ -69,33 +66,31 @@ const MetricChart = () => {
         <AlertTitle>Error</AlertTitle>
         Sorry, something might not be working at the moment!
       </Alert>
-    )
+    );
   }
   if (!data) return null;
-  console.log('metricQuery', data);
   const { getMultipleMeasurements } = data;
-    if (!getMultipleMeasurements.length) {
-      return [];
-    }
+  if (!getMultipleMeasurements.length) {
+    return [];
+  }
+  const names = {
+    injValveOpen: 'INJ Valve Open',
+    oilTemp: 'Oil Temp',
+    tubingPressure: 'Tubing Pressure',
+    flareTemp: 'Flare Temp',
+    casingPressure: 'Casing Pressure',
+    waterTemp: 'Water Temp',
+  };
 
-      const names = {
-        injValveOpen: 'INJ Valve Open',
-        oilTemp: 'Oil Temp',
-        tubingPressure: 'Tubing Pressure',
-        flareTemp: 'Flare Temp',
-        casingPressure: 'Casing Pressure',
-        waterTemp: 'Water Temp',
-      };
-    
-      const colors = {
-        injValveOpen: '#e0db16',
-        oilTemp: '#000000',
-        tubingPressure: '#d8110e',
-        flareTemp: '#a686cc',
-        casingPressure: '#4c146a',
-        waterTemp: '#54b3d3',
-      };
-return(
+  const colors = {
+    injValveOpen: '#e1ad01',
+    oilTemp: '#000000',
+    tubingPressure: '#d8110e',
+    flareTemp: '#a686cc',
+    casingPressure: '#66c789',
+    waterTemp: '#54b3d3',
+  };
+  return (
     <>
       <LineChart width={1200} height={600}>
         <CartesianGrid strokeDasharray="5 5" />
@@ -103,22 +98,19 @@ return(
         <YAxis dataKey="value" />
         <Tooltip />
         <Legend layout="vertical" verticalAlign="middle" align="right" />
-        {getMultipleMeasurements.map(data => {
-          return (
-            <Line
-              dataKey="value"
-              data={data.measurements}
-              name={names[data.metric]}
-              key={data.metrdatac}
-              dot={false}
-              stroke={colors[data.metric]}
-            />
-          );
-        })}
+        {getMultipleMeasurements.map(n => (
+          <Line
+            dataKey="value"
+            data={n.measurements}
+            name={names[n.metric]}
+            key={n.metric}
+            dot={false}
+            stroke={colors[n.metric]}
+          />
+        ))};
       </LineChart>
-  </>
-)
-  
+    </>
+  );
 };
 
 export default () => (

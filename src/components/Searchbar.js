@@ -1,4 +1,5 @@
-/* eslint-disable */
+/* eslint-disable react/jsx-props-no-spreading */
+/* Quick fix for Material UI standarized component (Autocomplete) */
 import React from 'react';
 import {
   ApolloClient,
@@ -6,23 +7,13 @@ import {
   useQuery,
   gql,
   InMemoryCache,
-} from "@apollo/client";
+} from '@apollo/client';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import Alert from '@material-ui/lab/Alert';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import { Alert, AlertTitle } from '@material-ui/lab';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateMetric, deleteMetric } from '../reducers/metricReducer';
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    width: 500,
-    '& > * + *': {
-      marginTop: theme.spacing(3),
-    },
-  },
-}));
 
 const client = new ApolloClient({
   uri: 'https://react.eogresources.com/graphql',
@@ -35,63 +26,62 @@ const METRICS = gql`{
 
 function Searchbar() {
   const dispatch = useDispatch();
-  const classes = useStyles();
-  let { loading, error, data } = useQuery(METRICS);
+  const { loading, error, data } = useQuery(METRICS);
   const selectedMetrics = useSelector((state) => state.metrics);
-  console.log('STATE',selectedMetrics);
- 
+
   if (loading) {
-      return <CircularProgress />
-  } else if (error) {
-      return (
-        <Alert severity="error">
-          <AlertTitle>Error</AlertTitle>
-          Sorry, something might not be working at the moment!
-        </Alert>
-      )
+    return <CircularProgress />;
+  }
+  if (error) {
+    return (
+      <Alert severity="error">
+        <AlertTitle>Error</AlertTitle>
+        Sorry, something might not be working at the moment!
+      </Alert>
+    );
   }
 
   const handleSelect = (event, value) => {
     const selectedValues = value;
-    selectedMetrics.forEach((data) => {
-      if(selectedValues.indexOf(data) === -1){
-        const i = selectedMetrics.indexOf(data);
-        dispatch((deleteMetric(selectedMetrics[i])))
+    selectedMetrics.forEach((n) => {
+      if (selectedValues.indexOf(n) === -1) {
+        const i = selectedMetrics.indexOf(n);
+        dispatch((deleteMetric(selectedMetrics[i])));
       }
-    })
+    });
     const selectedValue = selectedValues.filter(
       (metric) => !selectedMetrics.includes(metric),
     );
     if (selectedValue.length) {
       dispatch(updateMetric(selectedValue[0]));
     }
-    
   };
 
   // populate the array with metrics
-  var metricNames = [];
+  const metricNames = [];
   data.getMetrics.forEach(
-    (metricsObject) => metricNames.push(metricsObject));
-    
+    (metricsObject) => metricNames.push(metricsObject),
+  );
+
   return (
     <Autocomplete
-        multiple
-        id="tags-standard"
-        style={{ width: "900px" }}
-        options={metricNames}
-        getOptionLabel={(option) => option}
-        onChange={handleSelect}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            variant="standard"
-            label="Metric Values"
-            placeholder="Metric"
-          />
-        )}
-      />
-  );  
-};
+      multiple
+      id="tags-standard"
+      style={{ width: '900px' }}
+      options={metricNames}
+      getOptionLabel={(option) => option}
+      onChange={handleSelect}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          variant="standard"
+          label="Metric Values"
+          placeholder="Metric"
+        />
+      )}
+    />
+  );
+}
 
 export default () => (
   <ApolloProvider client={client}>

@@ -6,7 +6,7 @@ import CardTemplate from './CardTemplate';
 function MetricCard() {
   const selectedMetrics = useSelector(state => state.metrics);
   return (
-    <Grid container direction="row" justifyContent='flex-start' spacing={10}>
+    <Grid container style={{ margin: '0px' }} direction="row" justifyContent='flex-start' spacing={10}>
       {
         selectedMetrics.length > 0 && selectedMetrics.map((metric) => (
           <Grid
@@ -17,9 +17,10 @@ function MetricCard() {
             style={{
               maxWidth: '170px',
               maxHeight: '100px',
-              marginTop: '20px',
-              marginBottom: '100px',
+              marginTop: '15px',
+              marginBottom: '15px',
               marginRight: '20px',
+              padding: '0px',
             }}
           >
             <CardTemplate metric={metric} />
