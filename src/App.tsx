@@ -7,6 +7,7 @@ import Header from './components/Header';
 import Wrapper from './components/Wrapper';
 import Searchbar from './components/Searchbar';
 import MetricCard from './components/MetricCard';
+import MetricChart from './components/MetricChart';
 
 const theme = createTheme({
   palette: {
@@ -29,6 +30,7 @@ const App = () => (
       <Header />
       <Searchbar />
       <MetricCard />
+      <MetricChart />
       <ToastContainer />
     </Wrapper>
   </MuiThemeProvider>

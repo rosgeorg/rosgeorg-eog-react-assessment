@@ -14,7 +14,13 @@ function MetricCard() {
             item
             xs={12}
             key={metric}
-            style={{ maxWidth: '275px', maxHeight: '100px', margin: '10px' }}
+            style={{
+              maxWidth: '170px',
+              maxHeight: '100px',
+              marginTop: '20px',
+              marginBottom: '100px',
+              marginRight: '20px',
+            }}
           >
             <CardTemplate metric={metric} />
           </Grid>
