@@ -1,24 +1,12 @@
 /* eslint-disable react/jsx-props-no-spreading */
 /* Quick fix for Material UI standarized component (Autocomplete) */
 import React from 'react';
-import {
-  ApolloClient,
-  ApolloProvider,
-  useQuery,
-  gql,
-  InMemoryCache,
-} from '@apollo/client';
+import { gql } from '@apollo/client';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { Alert, AlertTitle } from '@material-ui/lab';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateMetric, deleteMetric } from '../reducers/metricReducer';
-
-const client = new ApolloClient({
-  uri: 'https://react.eogresources.com/graphql',
-  cache: new InMemoryCache(),
-});
+import useQueryRequest from '../hooks/useQueryRequest';
 
 const METRICS = gql`{
   getMetrics
@@ -26,21 +14,18 @@ const METRICS = gql`{
 
 function Searchbar() {
   const dispatch = useDispatch();
-  const { loading, error, data } = useQuery(METRICS);
-  const selectedMetrics = useSelector((state) => state.metrics);
+  const selectedMetrics = useSelector(state => state.metrics);
+  const data = useQueryRequest(METRICS);
 
-  if (loading) {
-    return <CircularProgress />;
-  }
-  if (error) {
-    return (
-      <Alert severity="error">
-        <AlertTitle>Error</AlertTitle>
-        Sorry, something might not be working at the moment!
-      </Alert>
+  // populate the array with metrics
+  const metricNames = [];
+  if (data.getMetrics) {
+    data.getMetrics.forEach(
+      (metricsObject) => metricNames.push(metricsObject),
     );
   }
 
+  /* Handling metrics selection from the dropdown menu */
   const handleSelect = (event, value) => {
     const selectedValues = value;
     selectedMetrics.forEach((n) => {
@@ -56,12 +41,6 @@ function Searchbar() {
       dispatch(updateMetric(selectedValue[0]));
     }
   };
-
-  // populate the array with metrics
-  const metricNames = [];
-  data.getMetrics.forEach(
-    (metricsObject) => metricNames.push(metricsObject),
-  );
 
   return (
     <Autocomplete
@@ -83,8 +62,4 @@ function Searchbar() {
   );
 }
 
-export default () => (
-  <ApolloProvider client={client}>
-    <Searchbar />
-  </ApolloProvider>
-);
+export default Searchbar;
