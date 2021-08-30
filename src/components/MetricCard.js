@@ -19,7 +19,8 @@ function MetricCard() {
               maxHeight: '100px',
               marginTop: '15px',
               marginBottom: '15px',
-              marginRight: '20px',
+              marginRight: '10px',
+              marginLeft: '10px',
               padding: '0px',
             }}
           >

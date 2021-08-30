@@ -1,17 +1,11 @@
+/* eslint-disable */
 import React from 'react';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import Typography from '@material-ui/core/Typography';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { makeStyles } from '@material-ui/core/styles';
-import { Alert, AlertTitle } from '@material-ui/lab';
-import {
-  ApolloClient,
-  ApolloProvider,
-  useQuery,
-  gql,
-  InMemoryCache,
-} from '@apollo/client';
+import { gql } from '@apollo/client';
+import useQueryWithVariables from '../hooks/useQueryWithVariables';
 
 const useStyles = makeStyles({
   root: {
@@ -30,11 +24,6 @@ const useStyles = makeStyles({
   },
 });
 
-const client = new ApolloClient({
-  uri: 'https://react.eogresources.com/graphql',
-  cache: new InMemoryCache(),
-});
-
 const METRIC_LAST_MEASUREMENT = gql`
   query ($metricName: String!) {
     getLastKnownMeasurement(metricName: $metricName) {
@@ -48,21 +37,16 @@ const METRIC_LAST_MEASUREMENT = gql`
 
 const CardTemplate = ({ metric }) => {
   const classes = useStyles();
-  const { loading, error, data } = useQuery(METRIC_LAST_MEASUREMENT, {
+  let value = 0;
+  let unit = '';
+  const data = useQueryWithVariables(METRIC_LAST_MEASUREMENT, {
     variables: { metricName: metric },
-    pollInterval: 2000,
+    pollInterval: 1500,
   });
-  if (loading) {
-    return <CircularProgress />;
-  } if (error) {
-    return (
-      <Alert severity="error">
-        <AlertTitle>Error</AlertTitle>
-        Sorry, something might not be working at the moment!
-      </Alert>
-    );
+  if(data.getLastKnownMeasurement){
+    value = data.getLastKnownMeasurement.value;
+    unit = data.getLastKnownMeasurement.unit;
   }
-  const { value, unit } = data.getLastKnownMeasurement;
 
   return (
     <Card className={classes.root}>
@@ -79,7 +63,5 @@ const CardTemplate = ({ metric }) => {
 };
 
 export default ({ metric }) => (
-  <ApolloProvider client={client}>
-    <CardTemplate metric={metric} />
-  </ApolloProvider>
+  <CardTemplate metric={metric} />
 );

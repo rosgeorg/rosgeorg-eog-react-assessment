@@ -1,4 +1,11 @@
+/* eslint-disable */ 
 import React, { useState, useEffect } from 'react';
+import { gql } from '@apollo/client';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { Alert, AlertTitle } from '@material-ui/lab';
+import { useSelector } from 'react-redux';
+import { subMinutes, getUnixTime } from 'date-fns';
+import useQueryWithVariables from '../hooks/useQueryWithVariables';
 import {
   LineChart,
   Line,
@@ -8,22 +15,6 @@ import {
   Tooltip,
   Legend,
 } from 'recharts';
-import {
-  ApolloClient,
-  ApolloProvider,
-  useQuery,
-  gql,
-  InMemoryCache,
-} from '@apollo/client';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { Alert, AlertTitle } from '@material-ui/lab';
-import { useSelector } from 'react-redux';
-import { subMinutes, getUnixTime } from 'date-fns';
-
-const client = new ApolloClient({
-  uri: 'https://react.eogresources.com/graphql',
-  cache: new InMemoryCache(),
-});
 
 const MULTIPLE_METRICS_MEASUREMENTS = gql`
   query ($input: [MeasurementQuery]!) {
@@ -39,9 +30,10 @@ const MULTIPLE_METRICS_MEASUREMENTS = gql`
   }
 `;
 
-const MetricChart = () => {
+function MetricChart() {
   const selectedMetrics = useSelector(state => state.metrics);
   const [metricQuery, setMetricQuery] = useState([]);
+  let getMultipleMeasurements =[];
 
   useEffect(() => {
     if (!selectedMetrics.length) {
@@ -54,25 +46,17 @@ const MetricChart = () => {
     })));
   }, [selectedMetrics]);
 
-  const { loading, error, data } = useQuery(MULTIPLE_METRICS_MEASUREMENTS, {
+  const data = useQueryWithVariables(MULTIPLE_METRICS_MEASUREMENTS, {
     variables: { input: [...metricQuery] },
   });
-  if (loading) {
-    return <CircularProgress />;
+  
+  if (data.getMultipleMeasurements) {
+    getMultipleMeasurements = data.getMultipleMeasurements;
+    if (!getMultipleMeasurements.length) {
+      return [];
+    }
   }
-  if (error) {
-    return (
-      <Alert severity="error">
-        <AlertTitle>Error</AlertTitle>
-        Sorry, something might not be working at the moment!
-      </Alert>
-    );
-  }
-  if (!data) return null;
-  const { getMultipleMeasurements } = data;
-  if (!getMultipleMeasurements.length) {
-    return [];
-  }
+
   const names = {
     injValveOpen: 'INJ Valve Open',
     oilTemp: 'Oil Temp',
@@ -91,30 +75,26 @@ const MetricChart = () => {
     waterTemp: '#54b3d3',
   };
   return (
-    <>
-      <LineChart width={1200} height={600}>
-        <CartesianGrid strokeDasharray="5 5" />
-        <XAxis dataKey="at" type="category" allowDuplicatedCategory={false} />
-        <YAxis dataKey="value" />
-        <Tooltip />
-        <Legend layout="vertical" verticalAlign="middle" align="right" />
-        {getMultipleMeasurements.map(n => (
-          <Line
-            dataKey="value"
-            data={n.measurements}
-            name={names[n.metric]}
-            key={n.metric}
-            dot={false}
-            stroke={colors[n.metric]}
-          />
-        ))};
-      </LineChart>
-    </>
+    <LineChart width={1200} height={600}>
+      <CartesianGrid strokeDasharray="5 5" />
+      <XAxis dataKey="at" type="category" allowDuplicatedCategory={false} />
+      <YAxis dataKey="value" />
+      <Tooltip />
+      <Legend layout="vertical" verticalAlign="middle" align="right" />
+      {selectedMetrics.length > 0 && getMultipleMeasurements.map(n => (
+        <Line
+          dataKey="value"
+          data={n.measurements}
+          name={names[n.metric]}
+          key={n.metric}
+          dot={false}
+          stroke={colors[n.metric]}
+        />
+      ))};
+    </LineChart>
   );
-};
+}
 
 export default () => (
-  <ApolloProvider client={client}>
-    <MetricChart />
-  </ApolloProvider>
+  <MetricChart />
 );
