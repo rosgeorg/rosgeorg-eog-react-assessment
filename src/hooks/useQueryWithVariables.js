@@ -4,9 +4,7 @@ import { Alert, AlertTitle } from '@material-ui/lab';
 import { useQuery } from '@apollo/client';
 
 function useQueryWithVariables(queryName, queryVariables) {
-  console.log('QUERYVARIABLES', queryVariables);
   const { loading, error, data } = useQuery(queryName, queryVariables);
-  console.log('DATA EN HOOK', data);
   if (loading) {
     return <CircularProgress />;
   }
